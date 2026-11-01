@@ -6,11 +6,13 @@ An end-to-end R analytics pipeline and interactive Shiny simulation platform. Th
 
 ---
 
-### Data Source
-The raw transaction dataset (`Warehouse_and_Retail_Sales.csv`) exceeds GitHub's direct upload threshold. 
-* Download the dataset from [[Kaggle / Source Link](https://www.kaggle.com/datasets/fatemehmohammadinia/retail-sales-data-set-of-alcohol-and-liquor)].
-* Place `Warehouse_and_Retail_Sales.csv` in the root directory before executing `supply_chain_pipeline.R` or launching `app.R`.
+## Data Source
 
+The raw transaction dataset (`Warehouse_and_Retail_Sales.csv`) exceeds GitHub's direct upload threshold.
+* **Download:** [Retail Sales Dataset on Kaggle](https://www.kaggle.com/datasets/surajjha101/stores-area-and-sales-data) *(Montgomery County Warehouse and Retail Sales)*
+* **Setup:** Place `Warehouse_and_Retail_Sales.csv` in the project root directory before running the batch pipeline or Shiny application.
+
+---
 
 ## Executive Summary & Core Insights
 
@@ -24,35 +26,37 @@ Analysis across **38,236 catalog SKUs** highlights significant demand skewness a
 
 ## Architectural Pipeline
 
+```text
 Raw Transaction Logs (Warehouse & Retail Outflows)
-│
-▼
-[ Data Ingestion & Sanitization Engine ]
-• Missing value imputation
-• Outflow reconciliation (Sales + Warehouse Transfers)
-• Monthly temporal aggregation
-│
-▼
-[ ABC-XYZ Multi-Echelon Demand Segmentation ]
-• Pareto volume concentration (Cumulative share: 80% / 15% / 5%)
-• Coefficient of Variation (CV) tiering (X: <=0.5, Y: 0.5-1.0, Z: >1.0)
-│
-▼
-[ Stochastic Inventory Policy Optimization ]
-• Lead-time variance propagation
-• Dynamic Z-score scaling via Cycle Service Level (CSL)
-• Safety Stock & Reorder Point (ROP) derivation
-│
-┌─────────────┴─────────────┐
-▼                           ▼
+                       │
+                       ▼
+    [ Data Ingestion & Sanitization Engine ]
+      • Missing value imputation
+      • Outflow reconciliation (Sales + Warehouse Transfers)
+      • Monthly temporal aggregation
+                       │
+                       ▼
+    [ ABC-XYZ Multi-Echelon Demand Segmentation ]
+      • Pareto volume concentration (Cumulative share: 80% / 15% / 5%)
+      • Coefficient of Variation (CV) tiering (X: <=0.5, Y: 0.5-1.0, Z: >1.0)
+                       │
+                       ▼
+    [ Stochastic Inventory Policy Optimization ]
+      • Lead-time variance propagation
+      • Dynamic Z-score scaling via Cycle Service Level (CSL)
+      • Safety Stock & Reorder Point (ROP) derivation
+                       │
+         ┌─────────────┴─────────────┐
+         ▼                           ▼
 [ Automated Batch Outputs ]   [ Interactive Shiny Simulation Platform ]
 • eda_abc_xyz_distribution.png  • Real-time Cycle Service Level slider (80% - 99.9%)
 • abc_xyz_matrix_summary.csv    • Live supplier lead-time & variance sensitivity
 • sku_inventory_optimization.csv • Interactive working capital & holding cost KPIs
-• Searchable SKU-level policy explorer (DT)
-
+                                • Searchable SKU-level policy explorer (DT)
+```
 
 ---
+
 
 ## Mathematical Formulation
 
@@ -99,8 +103,10 @@ Where $H$ represents the annual carrying cost rate (typically 18%–25% covering
 
 ---
 
+
 ## Repository Structure
 
+```text
 .
 ├── app.R                           # Interactive Shiny dashboard (bslib, DT, bsicons)
 ├── supply_chain_pipeline.R         # Batch data processing & optimization script
@@ -110,7 +116,7 @@ Where $H$ represents the annual carrying cost rate (typically 18%–25% covering
 ├── .lintr                          # Linter configuration
 ├── .gitignore                      # Git ignore rules
 └── README.md                       # Architectural and mathematical documentation
-
+```
 
 ---
 
@@ -118,19 +124,36 @@ Where $H$ represents the annual carrying cost rate (typically 18%–25% covering
 
 ### Prerequisites
 * R (>= 4.2.0)
-* R Packages:
-  ```r
-  install.packages(c("tidyverse", "lubridate", "scales", "shiny", "bslib", "DT", "bsicons"))
-1. Data Setup
-Place the source dataset (Warehouse_and_Retail_Sales.csv) into the root directory.
+* Install required packages:
+```r
+install.packages(c("tidyverse", "lubridate", "scales", "shiny", "bslib", "DT", "bsicons"))
+```
 
-2. Run the Batch Pipeline
-Execute the autonomous ETL, calculate matrix distributions, and generate output tables and figures:
+### 1. Data Setup
+Place the source dataset (`Warehouse_and_Retail_Sales.csv`) into the project root directory.
 
-R
+### 2. Run the Batch Pipeline
+Execute the autonomous ETL to calculate matrix distributions and generate summary CSVs and charts:
+```r
 source("supply_chain_pipeline.R")
-3. Launch the Interactive Dashboard
-Launch the reactive simulation app to test service-level trade-offs and evaluate working capital commitments:
+```
 
-R
+### 3. Launch the Interactive Dashboard
+Launch the simulation application to test service-level trade-offs and evaluate capital commitments in real time:
+```r
 shiny::runApp("app.R")
+```
+
+---
+
+## Author & Project Lead
+
+**Ashutosh Tembhekar**  
+*Data & Supply Chain Analytics Professional*  
+
+* **Domain Specialization:** Enterprise Supply Chain Analytics, Demand Forecasting & Segmentation (ABC-XYZ), Stochastic Inventory Policy Modeling, and ERP Data Pipeline Integration.
+* **Technical Toolchain:** R (tidyverse, Shiny, bslib, DT), Python (Exploratory Data Analysis, Machine Learning), Power BI, SQL, JSON.
+* **Professional Background:** Analytics & Data Engineering practitioner specializing in bridging commercial operations, supply chain logistics, and production-grade business intelligence applications.
+
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat&logo=github)](https://github.com/AshutoshTembhekar)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Projects-blue?style=flat&logo=buffer)](https://github.com/AshutoshTembhekar?tab=repositories)
