@@ -1,4 +1,3 @@
-Markdown
 # Enterprise Supply Chain Analytics: Stochastic Inventory Optimization Engine
 
 An end-to-end R analytics pipeline and interactive Shiny simulation platform. This system ingests multi-year transactional retail sales and warehouse movement logs, executes multi-echelon demand segmentation using an ABC-XYZ Matrix, and calculates stochastic Safety Stock and dynamic Reorder Points (ROP) under simultaneous demand and supplier lead-time uncertainty.
@@ -6,6 +5,12 @@ An end-to-end R analytics pipeline and interactive Shiny simulation platform. Th
 ![ABC-XYZ Matrix Distribution](eda_abc_xyz_distribution.png)
 
 ---
+
+### Data Source
+The raw transaction dataset (`Warehouse_and_Retail_Sales.csv`) exceeds GitHub's direct upload threshold. 
+* Download the dataset from [[Kaggle / Source Link](https://www.kaggle.com/datasets/fatemehmohammadinia/retail-sales-data-set-of-alcohol-and-liquor)].
+* Place `Warehouse_and_Retail_Sales.csv` in the root directory before executing `supply_chain_pipeline.R` or launching `app.R`.
+
 
 ## Executive Summary & Core Insights
 
