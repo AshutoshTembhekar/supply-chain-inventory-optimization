@@ -65,4 +65,79 @@ $$CV = \frac{\sigma_d}{\mu_d}$$
 $$\text{Volatility Tier} = \begin{cases} X \text{ (Stable / Predictable)}, & CV \le 0.50 \\ Y \text{ (Variable / Seasonal)}, & 0.50 < CV \le 1.00 \\ Z \text{ (Sporadic / Lumpy)}, & CV > 1.00 \end{cases}$$
 
 ### 3. Stochastic Safety Stock Modeling
-To prevent stockouts during replenishment cycles, the
+To prevent stockouts during replenishment cycles, the safety stock model accounts for both customer demand variability ($\sigma_d$) and supplier lead-time variability ($\sigma_L$):
+
+$$SS = Z \cdot \sqrt{\bar{L} \cdot \sigma_d^2 + \bar{d}^2 \cdot \sigma_L^2}$$
+
+Where:
+* $Z = \Phi^{-1}(\text{CSL})$: Inverse standard normal cumulative distribution function for target Cycle Service Level.
+* $\bar{d}$: Mean monthly demand.
+* $\sigma_d$: Standard deviation of monthly demand.
+* $\bar{L}$: Mean supplier lead time (in months).
+* $\sigma_L$: Standard deviation of supplier lead time (in months).
+
+### 4. Dynamic Reorder Point (ROP)
+
+$$\text{ROP} = (\bar{d} \cdot \bar{L}) + SS$$
+
+### 5. Working Capital & Carrying Cost Dynamics
+
+$$\text{Safety Stock Capital} = \sum (SS_i \times \text{Unit Cost})$$
+
+$$\text{Annual Holding Cost} = \text{Safety Stock Capital} \times H$$
+
+Where $H$ represents the annual carrying cost rate (typically 18%–25% covering capital cost, warehousing, insurance, and obsolescence).
+
+---
+
+## Repository Structure
+
+| File | Type | Description |
+| :--- | :--- | :--- |
+| `app.R` | R Script | Interactive Shiny dashboard (`bslib`, `DT`, `bsicons`) |
+| `supply_chain_pipeline.R` | R Script | Batch data processing, segmentation, and optimization script |
+| `abc_xyz_matrix_summary.csv` | Dataset | Segment distribution counts and volume percentages |
+| `eda_abc_xyz_distribution.png` | Asset | High-resolution ABC-XYZ distribution plot |
+| `sku_inventory_optimization.csv` | Dataset | Granular SKU policy output (SS, ROP, CV, Recommended Tier) |
+| `.lintr` | Config | R linter configuration rules |
+| `.gitignore` | Config | Git ignore rules |
+| `README.md` | Documentation | Architecture, mathematical formulations & setup guide |
+
+---
+
+## Setup & Execution
+
+### Prerequisites
+* R (>= 4.2.0)
+* Install required packages:
+```r
+install.packages(c("tidyverse", "lubridate", "scales", "shiny", "bslib", "DT", "bsicons"))
+```
+
+### 1. Data Setup
+Place the source dataset (`Warehouse_and_Retail_Sales.csv`) into the project root directory.
+
+### 2. Run the Batch Pipeline
+Execute the autonomous ETL to calculate matrix distributions and generate summary CSVs and charts:
+```r
+source("supply_chain_pipeline.R")
+```
+
+### 3. Launch the Interactive Dashboard
+Launch the simulation application to test service-level trade-offs and evaluate capital commitments in real time:
+```r
+shiny::runApp("app.R")
+```
+
+---
+
+## Author & Project Lead
+
+**Ashutosh Tembhekar**  
+*Data & Supply Chain Analytics Professional*  
+* **Domain Specialization:** Enterprise Supply Chain Analytics, Demand Forecasting & Segmentation (ABC-XYZ), Stochastic Inventory Policy Modeling, and ERP Data Pipeline Integration.
+* **Technical Toolchain:** R (tidyverse, Shiny, bslib, DT), Python (Exploratory Data Analysis, Machine Learning), Power BI, SQL, JSON.
+* **Professional Background:** Analytics & Data Engineering practitioner specializing in bridging commercial operations, supply chain logistics, and production-grade business intelligence applications.
+
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat&logo=github)](https://github.com/AshutoshTembhekar)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/ashutoshtembhekar/)
