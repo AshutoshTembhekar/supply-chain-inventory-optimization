@@ -1,37 +1,37 @@
 
 # Supply Chain Inventory Optimization
+
 ### ABC-XYZ Demand Segmentation & Stochastic Inventory Policy Engine
 
-An end-to-end R analytics pipeline and interactive Shiny application for SKU-level demand segmentation, stochastic Safety Stock calculation, dynamic Reorder Point (ROP) optimization, and inventory working-capital analysis.
+An end-to-end R analytics pipeline and interactive Shiny application for SKU-level demand segmentation, stochastic Safety Stock calculation, dynamic Reorder Point (ROP) analysis, and inventory working-capital estimation.
 
-The project combines supply chain analytics, statistical demand classification, and inventory policy simulation to translate historical warehouse and retail movement data into actionable replenishment insights.
+The project uses historical warehouse and retail movement data to examine demand concentration, demand variability, and how different service-level and supplier lead-time assumptions affect inventory requirements.
 
 ---
 
 ## 1. Project Overview
 
-Managing thousands of SKUs creates a complex inventory planning problem.
+Managing a large SKU portfolio creates a challenge for inventory planning.
 
-High-volume products require reliable replenishment to reduce stockout exposure, while low-velocity and unpredictable products can tie up working capital through unnecessary inventory.
+High-volume products require careful replenishment planning to reduce stockout exposure. Meanwhile, products with low or unpredictable demand may require different inventory policies to avoid holding more stock than necessary.
 
-This project addresses that challenge through an analytical workflow that:
+This project develops an analytical workflow to:
 
-- Analyzes historical SKU-level outbound movement.
-- Classifies products using ABC analysis based on cumulative volume contribution.
-- Evaluates demand predictability using XYZ segmentation and the Coefficient of Variation (CV).
-- Calculates stochastic Safety Stock using demand and supplier lead-time variability.
-- Derives dynamic Reorder Points based on target Cycle Service Levels.
-- Evaluates inventory policy trade-offs through an interactive Shiny simulation.
+- Analyze historical SKU-level outbound movement.
+- Classify products using ABC analysis based on cumulative outbound volume.
+- Evaluate demand variability using XYZ segmentation.
+- Calculate Safety Stock using demand and supplier lead-time variability.
+- Estimate Reorder Points based on target Cycle Service Levels.
+- Explore inventory policy trade-offs through an interactive Shiny application.
+- Estimate the working-capital implications of modeled safety-stock requirements.
 
-**Objective:** Move beyond static inventory thresholds and evaluate replenishment policies according to SKU-level demand characteristics and service-level requirements.
-
----
+**Project objective:** Build a data-driven inventory analysis framework that connects SKU demand characteristics with replenishment policy assumptions.
 
 ## 2. Executive Summary & Key Findings
 
-The analysis covers **38,236 catalog SKUs**, revealing a highly concentrated demand distribution alongside substantial variation in SKU-level demand predictability.
+The analysis covers **38,236 SKUs** and identifies substantial concentration in outbound volume, alongside variation in SKU-level demand predictability.
 
-### Portfolio-Level Results
+### Portfolio-level results
 
 | Metric | Result |
 |---|---:|
@@ -39,34 +39,34 @@ The analysis covers **38,236 catalog SKUs**, revealing a highly concentrated dem
 | Class A SKUs | 1,486 |
 | Class A share of catalog | 3.9% |
 | Class AX SKUs | 1,182 |
-| High-volume volatile SKUs (AY/AZ) | 304 |
+| Class AY/AZ SKUs | 304 |
 | Class C SKUs | 33,690 |
 | Class C share of catalog | 88.1% |
 | Class CZ SKUs | 4,499 |
 
-### Key Business Insights
+### Key findings
 
-**1. Demand Concentration — Class A**
+**1. Demand concentration — Class A**
 
-Just 1,486 SKUs, representing approximately 3.9% of the catalog, account for over 80% of aggregate outbound volume.
+A total of 1,486 SKUs, representing approximately 3.9% of the catalog, account for over 80% of aggregate outbound volume.
 
-Within this group, 1,182 SKUs fall into the AX segment, representing high-volume products with relatively stable demand.
+Within this group, 1,182 SKUs are classified as AX, combining high volume contribution with relatively stable demand.
 
-These products are candidates for evaluating standardized replenishment policies, closer inventory monitoring, and potential supplier coordination programs.
+These products are candidates for closer replenishment monitoring and more consistent inventory policy evaluation.
 
-**2. High-Volume Demand Variability — AY/AZ**
+**2. High-volume demand variability — AY/AZ**
 
 A total of 304 SKUs fall into the AY and AZ segments.
 
-These products combine high volume contribution with greater demand variability. Their replenishment policies warrant closer evaluation because demand fluctuations can increase exposure to stockouts.
+These products have high volume contribution but comparatively greater demand variability. Their replenishment requirements may therefore be more sensitive to changes in demand and supplier lead times.
 
-**3. Long-Tail Inventory — Class C**
+**3. Long-tail inventory — Class C**
 
-Class C contains 33,690 SKUs, approximately 88.1% of the catalog, while contributing less than 5% of aggregate volume.
+Class C contains 33,690 SKUs, approximately 88.1% of the catalog, while contributing less than 5% of aggregate outbound volume.
 
-Of these, 4,499 SKUs fall into the CZ segment, indicating low-volume and highly variable demand patterns.
+Of these, 4,499 SKUs fall into the CZ segment, indicating low-volume and highly variable demand.
 
-This segment provides an opportunity to investigate alternative replenishment strategies, minimum-order-quantity adjustments, and made-to-order approaches.
+This segment is worth investigating for alternative replenishment approaches, subject to operational constraints and actual inventory costs.
 
 > These findings describe the analyzed dataset. Suggested inventory strategies are analytical opportunities, not measured operational savings or guaranteed improvements.
 
@@ -74,50 +74,38 @@ This segment provides an opportunity to investigate alternative replenishment st
 
 ## 3. Analytical Architecture
 
-The project follows a batch analytical pipeline connected to an interactive Shiny simulation application.
+The workflow consists of a batch analytics pipeline followed by an interactive Shiny application.
 
 ```mermaid
 flowchart TD
-    A["Raw Warehouse & Retail Transaction Data"]
-    B["Data Ingestion and Sanitization"]
-    C["Monthly SKU-Level Demand Aggregation"]
-    D["ABC Segmentation<br/>Volume Contribution"]
-    E["XYZ Segmentation<br/>Demand Variability"]
-    F["ABC-XYZ Classification"]
-    G["Stochastic Safety Stock Modeling"]
-    H["Dynamic Reorder Point Calculation"]
-    I["Batch Analytical Outputs"]
-    J["Interactive Shiny Application"]
-
-    A --> B
-    B --> C
-    C --> D
-    C --> E
-    D --> F
+    A["Warehouse & Retail Transaction Data"] --> B["Data Ingestion & Cleaning"]
+    B --> C["Monthly SKU Demand Aggregation"]
+    C --> D["ABC Demand Segmentation"]
+    C --> E["XYZ Variability Segmentation"]
+    D --> F["Combined ABC-XYZ Classification"]
     E --> F
-    F --> G
-    G --> H
-    H --> I
-    H --> J
-
-    I --> K["CSV Summaries and Distribution Plot"]
-    J --> L["Service-Level Simulation"]
+    F --> G["Safety Stock Calculation"]
+    G --> H["Reorder Point Calculation"]
+    H --> I["CSV Analytical Outputs"]
+    H --> J["Shiny Simulation Application"]
+    I --> K["Summary Tables & Visualization"]
+    J --> L["Service-Level Analysis"]
     J --> M["Lead-Time Sensitivity"]
-    J --> N["Working Capital Analysis"]
+    J --> N["Working-Capital Estimates"]
     J --> O["SKU-Level Policy Explorer"]
 ```
 
-### Pipeline Components
+### Pipeline components
 
 | Component | Responsibility |
 |---|---|
-| Data ingestion | Loads and sanitizes transaction records |
-| Demand aggregation | Reconciles outbound movement and aggregates SKU activity monthly |
-| ABC analysis | Classifies SKUs by cumulative volume contribution |
-| XYZ analysis | Evaluates demand predictability using CV |
-| Inventory optimization | Calculates Safety Stock and Reorder Points |
-| Batch outputs | Generates classification summaries, visualizations and SKU-level policy outputs |
-| Shiny application | Enables interactive evaluation of service-level and lead-time assumptions |
+| Data ingestion | Loads and prepares transaction records |
+| Demand aggregation | Aggregates SKU activity at monthly intervals |
+| ABC analysis | Classifies SKUs by cumulative outbound volume |
+| XYZ analysis | Evaluates demand variability using the Coefficient of Variation |
+| Inventory modeling | Calculates Safety Stock and Reorder Points |
+| Batch outputs | Generates classification summaries and SKU-level results |
+| Shiny application | Allows interactive evaluation of inventory assumptions |
 
 ---
 
@@ -127,7 +115,7 @@ flowchart TD
 
 SKUs are ranked in descending order of total outbound volume.
 
-The cumulative volume share determines the ABC classification.
+The cumulative volume contribution determines the ABC classification.
 
 Let:
 
@@ -137,7 +125,7 @@ Let:
 The classification thresholds are:
 
 \[
-\text{ABC Class} =
+ABC_i =
 \begin{cases}
 A, & S_i \leq 0.80 \\
 B, & 0.80 < S_i \leq 0.95 \\
@@ -151,7 +139,9 @@ C, & S_i > 0.95
 | B | Next 15% | Medium-volume SKUs |
 | C | Final 5% | Low-volume SKUs |
 
-This segmentation distinguishes products according to their contribution to total outbound volume.
+This approach identifies products according to their contribution to total outbound volume.
+
+**Important:** ABC classification in this project is volume-based. It should not be interpreted as a classification by revenue, profitability, or gross margin.
 
 ### 4.2 XYZ Analysis — Demand Predictability
 
@@ -169,7 +159,7 @@ Where:
 The implemented classification thresholds are:
 
 \[
-\text{XYZ Class} =
+XYZ_i =
 \begin{cases}
 X, & CV \leq 0.50 \\
 Y, & 0.50 < CV \leq 1.00 \\
@@ -179,22 +169,22 @@ Z, & CV > 1.00
 
 | Class | CV Range | Interpretation |
 |---|---:|---|
-| X | CV ≤ 0.50 | Stable and predictable |
+| X | CV ≤ 0.50 | Relatively stable demand |
 | Y | 0.50 < CV ≤ 1.00 | Variable demand |
-| Z | CV > 1.00 | Highly variable or sporadic |
+| Z | CV > 1.00 | Highly variable demand |
 
-Combining ABC and XYZ produces nine inventory segments representing different combinations of volume contribution and demand predictability.
+Combining ABC and XYZ produces nine inventory segments, each representing a different combination of volume contribution and demand variability.
 
 ### 4.3 Stochastic Safety Stock Modeling
 
-Traditional safety-stock calculations often assume constant supplier lead time.
+A traditional Safety Stock calculation may assume that supplier lead time is constant.
 
-This project extends the calculation to account for both demand variability and supplier lead-time variability.
+This project uses a formulation that accounts for both demand variability and supplier lead-time variability.
 
-The implemented model is:
+The model is:
 
 \[
-SS = Z \cdot
+SS = Z \times
 \sqrt{
 \bar{L}\sigma_d^2 +
 \bar{d}^{\,2}\sigma_L^2
@@ -220,7 +210,12 @@ Z = \Phi^{-1}(CSL)
 
 Where \(CSL\) represents the target Cycle Service Level.
 
-**Model assumption:** The formulation uses an independence approximation between demand and supplier lead-time variability. It assumes compatible time units and is based on the standard stochastic lead-time demand variance formulation.
+**Model assumptions:**
+
+- Demand and supplier lead-time variability are treated using an independence approximation.
+- Demand and lead-time measurements must use compatible time units.
+- The calculation assumes the statistical inputs are representative of the modeled replenishment period.
+- The resulting Safety Stock is a model estimate, not a guarantee of a particular realized service level.
 
 ### 4.4 Dynamic Reorder Point
 
@@ -230,15 +225,21 @@ The Reorder Point represents the inventory position at which replenishment shoul
 ROP = (\bar{d} \times \bar{L}) + SS
 \]
 
-The model combines expected demand during replenishment lead time with the calculated safety-stock buffer.
+Where:
 
-This allows replenishment policies to respond to changes in demand variability, supplier lead time, and target service level.
+- \(\bar{d}\) = average monthly demand
+- \(\bar{L}\) = average supplier lead time in months
+- \(SS\) = calculated Safety Stock
+
+The model combines expected demand during supplier lead time with a Safety Stock buffer.
+
+This allows the modeled Reorder Point to change when demand, lead-time assumptions, or target service levels change.
 
 ### 4.5 Working Capital & Carrying Cost Analysis
 
-The project evaluates the financial implications of holding safety stock.
+The project estimates the capital associated with holding calculated Safety Stock.
 
-Safety-stock capital is estimated as:
+Safety Stock capital is estimated as:
 
 \[
 \text{Safety Stock Capital}
@@ -254,41 +255,47 @@ Annual holding cost is estimated as:
 \text{Safety Stock Capital} \times H
 \]
 
-Where \(H\) represents the assumed annual inventory carrying-cost rate.
+Where:
 
-The project uses an illustrative carrying-cost range of 18%–25%, covering factors such as capital cost, warehousing, insurance, and obsolescence.
+- \(SS_i\) = Safety Stock for SKU \(i\)
+- \(UnitCost_i\) = unit-cost input used for SKU \(i\)
+- \(H\) = assumed annual inventory carrying-cost rate
 
-Financial outputs depend on the unit-cost inputs and carrying-cost assumptions used in the implementation.
+The project uses an illustrative carrying-cost range of **18%–25%**.
+
+This range represents an assumption for scenario analysis, not a measured carrying-cost rate for a specific business.
+
+Financial estimates depend on the unit-cost inputs and carrying-cost assumptions used in the implementation. They should not be interpreted as realized working-capital savings.
 
 ---
 
 ## 5. Interactive Shiny Simulation
 
-The project includes an interactive Shiny application designed to explore inventory policy trade-offs.
+The project includes an interactive Shiny application for exploring inventory policy assumptions and their effects on calculated inventory requirements.
 
-### Simulation Capabilities
+### Simulation capabilities
 
 **Cycle Service Level Control**
 
-Adjust target service levels from 80% to 99.9% and evaluate the corresponding safety-stock requirements.
+Adjust target service levels from 80% to 99.9% and examine how the Safety Stock requirement changes.
 
 **Lead-Time Sensitivity**
 
-Explore how changes in supplier lead-time assumptions and variability affect replenishment requirements.
+Explore the effect of supplier lead-time assumptions and variability on replenishment requirements.
 
 **Working Capital Analysis**
 
-Examine the estimated capital implications of different safety-stock policies.
+Examine estimated Safety Stock capital under different inventory policy assumptions.
 
 **Holding Cost Evaluation**
 
-Evaluate how inventory carrying-cost assumptions affect modeled holding costs.
+Evaluate how different carrying-cost assumptions affect modeled annual holding costs.
 
 **SKU-Level Policy Explorer**
 
-Search and inspect individual SKU inventory recommendations through an interactive DT data table.
+Search and inspect individual SKU-level inventory outputs through an interactive DT data table.
 
-The simulation allows users to explore how inventory policy assumptions affect calculated replenishment requirements and modeled costs.
+The application is intended for analytical exploration. Its outputs depend on the input data and assumptions used in the underlying model.
 
 ---
 
@@ -300,61 +307,61 @@ The simulation allows users to explore how inventory policy assumptions affect c
 
 *Distribution of SKUs across ABC-XYZ demand segments.*
 
-This visualization provides an overview of the relationship between volume contribution and demand variability across the analyzed catalog.
+The visualization provides an overview of how the analyzed SKU portfolio is distributed across volume-contribution and demand-variability categories.
 
 ---
 
-## 7. Repository Structure
+## 7. Dataset
 
-```mermaid
-flowchart TD
-    ROOT["supply-chain-inventory-optimization/"]
+The project uses the **Montgomery County Warehouse and Retail Sales** dataset.
 
-    ROOT --> SRC["Source Code"]
-    ROOT --> OUT["Analytical Outputs"]
-    ROOT --> CFG["Configuration"]
-    ROOT --> DOC["Documentation"]
+The raw transaction file is not included in this repository because of its size.
 
-    SRC --> APP["app.R<br/>Interactive Shiny Dashboard"]
-    SRC --> PIPE["supply_chain_pipeline.R<br/>Batch Analytics & Optimization"]
+**Dataset source:** Kaggle
 
-    OUT --> SUMMARY["abc_xyz_matrix_summary.csv<br/>Segment Summary"]
-    OUT --> DIST["eda_abc_xyz_distribution.png<br/>ABC-XYZ Visualization"]
-    OUT --> SKU["sku_inventory_optimization.csv<br/>SKU-Level Policy Output"]
+To locate the dataset, search Kaggle for:
 
-    CFG --> LINT[".lintr<br/>R Linting Configuration"]
+`Montgomery County Warehouse and Retail Sales`
 
-    DOC --> README["README.md<br/>Project Documentation"]
+Download the source file and place it in the project root directory.
 
-    EXT["External Dataset<br/>Warehouse_and_Retail_Sales.csv"]
-    EXT -. "Downloaded separately" .-> ROOT
+The expected filename is:
 
-    classDef root fill:#166534,color:#ffffff,stroke:#14532d,stroke-width:2px
-    classDef source fill:#1d4ed8,color:#ffffff,stroke:#1e40af
-    classDef output fill:#0f766e,color:#ffffff,stroke:#115e59
-    classDef config fill:#64748b,color:#ffffff,stroke:#475569
-    classDef external fill:#92400e,color:#ffffff,stroke:#78350f
+`Warehouse_and_Retail_Sales.csv`
 
-    class ROOT root
-    class APP,PIPE source
-    class SUMMARY,DIST,SKU output
-    class LINT,README config
-    class EXT external
+The pipeline requires the source file to be available locally before execution.
+
+---
+
+## 8. Repository Structure
+
+```text
+supply-chain-inventory-optimization/
+│
+├── app.R
+├── supply_chain_pipeline.R
+├── abc_xyz_matrix_summary.csv
+├── eda_abc_xyz_distribution.png
+├── sku_inventory_optimization.csv
+├── .lintr
+└── README.md
 ```
 
-### External Dataset
+| File | Description |
+|---|---|
+| `supply_chain_pipeline.R` | Data processing, demand segmentation, and inventory calculations |
+| `app.R` | Interactive Shiny application |
+| `abc_xyz_matrix_summary.csv` | ABC-XYZ classification summary |
+| `eda_abc_xyz_distribution.png` | Segmentation distribution visualization |
+| `sku_inventory_optimization.csv` | SKU-level inventory policy outputs |
+| `.lintr` | R linting configuration |
+| `README.md` | Project documentation |
 
-The raw transaction dataset is not included in the repository because of its size.
-
-**Dataset:** Montgomery County Warehouse and Retail Sales
-
-Source: [Kaggle](https://www.kaggle.com/)
-
-Download the dataset and place `Warehouse_and_Retail_Sales.csv` in the project root directory before running the pipeline.
+**Note:** The source dataset, `Warehouse_and_Retail_Sales.csv`, must be downloaded separately and is not included in the repository.
 
 ---
 
-## 8. Technology Stack
+## 9. Technology Stack
 
 | Technology | Purpose |
 |---|---|
@@ -369,7 +376,7 @@ Download the dataset and place `Warehouse_and_Retail_Sales.csv` in the project r
 
 ---
 
-## 9. Setup & Execution
+## 10. Setup & Execution
 
 ### Prerequisites
 
@@ -377,7 +384,7 @@ Download the dataset and place `Warehouse_and_Retail_Sales.csv` in the project r
 - RStudio (recommended)
 - Source dataset: `Warehouse_and_Retail_Sales.csv`
 
-### Step 1 — Clone the Repository
+### Step 1 — Clone the repository
 
 ```bash
 git clone https://github.com/AshutoshTembhekar/supply-chain-inventory-optimization.git
@@ -385,7 +392,7 @@ git clone https://github.com/AshutoshTembhekar/supply-chain-inventory-optimizati
 cd supply-chain-inventory-optimization
 ```
 
-### Step 2 — Install Dependencies
+### Step 2 — Install dependencies
 
 Open R or RStudio and execute:
 
@@ -401,27 +408,29 @@ install.packages(c(
 ))
 ```
 
-### Step 3 — Add the Source Dataset
+### Step 3 — Add the source dataset
 
 Download the Montgomery County Warehouse and Retail Sales dataset from Kaggle.
 
-Place the downloaded file in the repository root and ensure its filename is:
+Place the downloaded CSV file in the repository root directory.
+
+Ensure the filename is:
 
 ```text
 Warehouse_and_Retail_Sales.csv
 ```
 
-### Step 4 — Run the Batch Pipeline
+### Step 4 — Run the analytical pipeline
 
-Execute the data processing and inventory optimization pipeline:
+Execute:
 
 ```r
 source("supply_chain_pipeline.R")
 ```
 
-The pipeline generates the analytical outputs, including the ABC-XYZ summary, distribution visualization, and SKU-level inventory optimization results.
+The pipeline processes the source data and generates the analytical outputs, including the ABC-XYZ summary, distribution visualization, and SKU-level inventory optimization results.
 
-### Step 5 — Launch the Shiny Application
+### Step 5 — Launch the Shiny application
 
 Run:
 
@@ -429,31 +438,36 @@ Run:
 shiny::runApp("app.R")
 ```
 
-The interactive application will open in your default browser.
+The Shiny application should open in your default browser.
 
 ---
 
-## 10. Limitations & Modeling Assumptions
+## 11. Limitations & Modeling Assumptions
+
+The results should be interpreted in the context of the following limitations:
 
 - The analysis depends on the quality, completeness, and temporal coverage of the source transaction data.
-- ABC classifications are based on historical outbound volume and do not directly measure profitability or revenue contribution.
-- XYZ classification depends on the selected monthly aggregation period and CV thresholds.
-- The stochastic safety-stock formulation uses an independence approximation between demand and supplier lead-time variability.
-- Replenishment recommendations are model outputs and should be evaluated against actual supplier constraints, operational policies, and inventory conditions.
+- ABC classifications are based on historical outbound volume, not revenue or profitability.
+- XYZ classification depends on the monthly aggregation period and selected CV thresholds.
+- Historical demand patterns may not represent future demand behavior.
+- The stochastic Safety Stock formulation uses an independence approximation between demand and supplier lead-time variability.
+- The model assumes compatible units for demand and lead-time inputs.
+- Replenishment recommendations are analytical outputs and should be evaluated against actual supplier constraints, operational policies, and inventory conditions.
 - Working-capital and holding-cost estimates depend on the unit-cost basis and carrying-cost assumptions.
-- Historical demand patterns do not guarantee future demand behavior.
 - The model should be validated against actual replenishment and stockout history before being used for operational decisions.
 
 ---
 
-## 11. Potential Extensions
+## 12. Potential Extensions
 
-- Integrate demand forecasting for future inventory planning.
-- Introduce SKU-specific service-level policies.
-- Compare alternative inventory optimization models.
-- Add supplier performance and lead-time reliability analysis.
-- Extend the dashboard with historical demand trends and inventory risk monitoring.
-- Evaluate replenishment policies using backtesting and simulated stockout scenarios.
+Potential areas for further development include:
+
+- Integrating demand forecasting into inventory planning.
+- Introducing SKU-specific service-level policies.
+- Comparing alternative Safety Stock and inventory optimization models.
+- Adding supplier performance and lead-time reliability analysis.
+- Extending the dashboard with historical demand trends and inventory risk monitoring.
+- Evaluating replenishment policies through backtesting and simulated stockout scenarios.
 
 ---
 
@@ -467,3 +481,4 @@ Supply Chain Analytics | Data Analytics | Statistical Modeling
 - LinkedIn: [Ashutosh Tembhekar](https://www.linkedin.com/in/ashutoshtembhekar/)
 
 ---
+
