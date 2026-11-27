@@ -369,36 +369,28 @@ The application recalculates the Z-score, Safety Stock and Reorder Point using t
 
 This enables scenario comparisons without modifying the underlying source data.
 
+
 ### 4.7 Working Capital & Annual Carrying Cost
 
 The Shiny application estimates the capital associated with the calculated Safety Stock.
 
-The calculation is:
+**Estimated Safety Stock Capital**
 
-\[
-\text{Estimated Safety Stock Capital}
-=
-\left(\sum_i SS_i\right) \times C
-\]
+Estimated Safety Stock Capital = Total Safety Stock Units × Average Unit Cost
+
+**Estimated Annual Carrying Cost**
+
+Estimated Annual Carrying Cost = Estimated Safety Stock Capital × Annual Carrying-Cost Rate
 
 Where:
 
-- \(SS_i\) = calculated Safety Stock for item \(i\)
-- \(C\) = user-selected average unit cost
+- Total Safety Stock Units = Sum of calculated Safety Stock across the selected items.
+- Average Unit Cost = User-entered average cost per unit.
+- Annual Carrying-Cost Rate = User-selected annual inventory carrying-cost percentage.
 
-Annual carrying cost is estimated as:
+The application uses a single average unit-cost input across all filtered items rather than SKU-specific purchase costs.
 
-\[
-\text{Estimated Annual Carrying Cost}
-=
-\text{Estimated Safety Stock Capital} \times H
-\]
-
-Where \(H\) is the selected annual carrying-cost rate.
-
-**Important:** The current application uses one user-entered average unit cost across all filtered items. It does not calculate SKU-specific inventory valuation from actual purchase costs.
-
-Consequently, these outputs are illustrative scenario estimates rather than audited inventory valuation or measured working-capital savings.
+**Important:** These figures are illustrative scenario estimates, not audited inventory valuation or measured working-capital savings.
 
 ### 4.8 Methodology Limitations
 
