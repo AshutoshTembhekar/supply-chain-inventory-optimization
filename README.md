@@ -437,19 +437,21 @@ The pipeline requires the source file to be available locally before execution.
 
 ---
 
-## 8. Repository Structure
+## Repository Structure
 
-```text
-supply-chain-inventory-optimization/
-│
-├── app.R
-├── supply_chain_pipeline.R
-├── abc_xyz_matrix_summary.csv
-├── eda_abc_xyz_distribution.png
-├── sku_inventory_optimization.csv
-├── .lintr
-└── README.md
+```mermaid
+flowchart TD
+    A["supply-chain-inventory-optimization/"] --> B["README.md"]
+    A --> C["supply_chain_pipeline.R"]
+    A --> D["app.R"]
+    A --> E["sku_inventory_optimization.csv"]
+    A --> F["abc_xyz_matrix_summary.csv"]
+    A --> G["eda_abc_xyz_distribution.png"]
+    A --> H[".lintr"]
 ```
+
+
+---
 
 | File | Description |
 |---|---|
