@@ -119,7 +119,7 @@ The analytical workflow consists of five stages:
 4. Safety Stock and Reorder Point calculations.
 5. Working-capital and carrying-cost scenario analysis.
 
-### 4.1 Data Preparation & Monthly Demand Aggregation
+### 4.1. Data Preparation & Monthly Demand Aggregation
 
 The source dataset contains warehouse and retail transaction records.
 
@@ -151,7 +151,7 @@ This produces a monthly outflow measure for each observed item combination.
 
 This distinction matters when interpreting demand variability and XYZ classifications.
 
-### 4.2 ABC Classification — Volume Concentration
+### 4.2. ABC Classification — Volume Concentration
 
 ABC analysis identifies products according to their contribution to total outbound volume.
 
@@ -194,7 +194,7 @@ Because classification is performed at item level, a product that crosses a thre
 
 **Interpretation:** ABC classification in this project is based on outbound volume, not sales revenue, gross margin, or inventory value.
 
-### 4.3 XYZ Classification — Demand Variability
+### 4.3. XYZ Classification — Demand Variability
 
 XYZ analysis evaluates the variability of historical monthly outflow.
 
@@ -242,7 +242,7 @@ AX, AY, AZ, BX, BY, BZ, CX, CY and CZ.
 
 **Interpretation:** XYZ classification reflects variability across the observed monthly records. Since the current pipeline does not insert zero-demand months where records are absent, intermittent demand may be understated. The classifications should therefore be interpreted with this data-treatment limitation in mind.
 
-### 4.4 Stochastic Safety Stock Calculation
+### 4.4. Stochastic Safety Stock Calculation
 
 The inventory model estimates Safety Stock using both demand variability and supplier lead-time variability.
 
@@ -313,7 +313,7 @@ safety_stock <- ceiling(
 - The statistical estimates are based on historical observed demand records.
 - The formula is a planning approximation and does not guarantee the realized service level.
 
-### 4.5 Reorder Point Calculation
+### 4.5. Reorder Point Calculation
 
 The Reorder Point estimates the inventory position at which replenishment should be initiated.
 
@@ -351,7 +351,7 @@ The batch pipeline uses the configured baseline assumptions:
 
 These are model configuration assumptions, not supplier-specific measurements.
 
-### 4.6 Interactive Scenario Analysis
+### 4.6. Interactive Scenario Analysis
 
 The Shiny application recalculates the inventory policy when the user changes the scenario parameters.
 
@@ -370,7 +370,7 @@ The application recalculates the Z-score, Safety Stock and Reorder Point using t
 This enables scenario comparisons without modifying the underlying source data.
 
 
-### 4.7 Working Capital & Annual Carrying Cost
+### 4.7. Working Capital & Annual Carrying Cost
 
 The Shiny application estimates the capital associated with the calculated Safety Stock.
 
@@ -392,7 +392,7 @@ The application uses a single average unit-cost input across all filtered items 
 
 **Important:** These figures are illustrative scenario estimates, not audited inventory valuation or measured working-capital savings.
 
-### 4.8 Methodology Limitations
+### 4.8. Methodology Limitations
 
 The following limitations should be considered when interpreting the results:
 
