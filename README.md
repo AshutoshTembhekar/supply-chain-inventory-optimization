@@ -276,35 +276,46 @@ The simulation makes it possible to evaluate how inventory policy assumptions af
 
 ---
 
+
 ## Repository Structure
 
-```text
-supply-chain-inventory-optimization/
-│
-├── app.R
-│   └── Interactive Shiny simulation application
-│
-├── supply_chain_pipeline.R
-│   └── Data processing, ABC-XYZ segmentation and inventory optimization
-│
-├── abc_xyz_matrix_summary.csv
-│   └── ABC-XYZ segment counts and volume contribution summary
-│
-├── eda_abc_xyz_distribution.png
-│   └── ABC-XYZ distribution visualization
-│
-├── sku_inventory_optimization.csv
-│   └── SKU-level inventory policy outputs
-│
-├── .lintr
-│   └── R linting configuration
-│
-├── .gitignore
-│   └── Git ignore configuration
-│
-└── README.md
-    └── Project documentation
+```mermaid
+flowchart TD
+    ROOT["supply-chain-inventory-optimization/"]
+
+    ROOT --> SRC["Source Code"]
+    ROOT --> DATA["Analytical Outputs"]
+    ROOT --> CONFIG["Configuration"]
+    ROOT --> DOC["Documentation"]
+
+    SRC --> APP["app.R<br/>Shiny Simulation Dashboard"]
+    SRC --> PIPE["supply_chain_pipeline.R<br/>Data Processing & Optimization"]
+
+    DATA --> SUMMARY["abc_xyz_matrix_summary.csv"]
+    DATA --> DIST["eda_abc_xyz_distribution.png"]
+    DATA --> SKU["sku_inventory_optimization.csv"]
+
+    CONFIG --> LINT[".lintr"]
+    CONFIG --> IGNORE[".gitignore"]
+
+    DOC --> README["README.md"]
+
+    EXTERNAL["External Dataset<br/>Warehouse_and_Retail_Sales.csv"]
+    EXTERNAL -. "Downloaded separately" .-> ROOT
+
+    classDef root fill:#166534,color:#ffffff,stroke:#14532d,stroke-width:2px
+    classDef source fill:#1d4ed8,color:#ffffff,stroke:#1e40af
+    classDef output fill:#0f766e,color:#ffffff,stroke:#115e59
+    classDef config fill:#64748b,color:#ffffff,stroke:#475569
+    classDef external fill:#92400e,color:#ffffff,stroke:#78350f
+
+    class ROOT root
+    class APP,PIPE source
+    class SUMMARY,DIST,SKU output
+    class LINT,IGNORE,README config
+    class EXTERNAL external
 ```
+
 
 ### External Dataset
 
