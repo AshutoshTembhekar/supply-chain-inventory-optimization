@@ -111,21 +111,70 @@ flowchart TD
 
 ## 4. Methodology
 
-### 4.1 ABC Analysis — Demand Concentration
+The analytical workflow consists of five stages:
 
-SKUs are ranked in descending order of total outbound volume.
+1. Transaction data preparation and monthly aggregation.
+2. ABC classification based on cumulative outbound volume.
+3. XYZ classification based on demand variability.
+4. Safety Stock and Reorder Point calculations.
+5. Working-capital and carrying-cost scenario analysis.
 
-The cumulative volume contribution determines the ABC classification.
+### 4.1 Data Preparation & Monthly Demand Aggregation
 
-Let:
+The source dataset contains warehouse and retail transaction records.
 
-- \(V_i\) = total outbound volume of SKU \(i\)
-- \(S_i\) = cumulative volume share up to SKU \(i\)
+The pipeline standardizes column names, replaces missing supplier names with `UNKNOWN SUPPLIER`, replaces missing item types with `OTHER`, and replaces missing retail sales values with zero.
 
-The classification thresholds are:
+The project calculates total monthly outflow using:
 
 \[
-ABC_i =
+\text{Total Outflow}
+=
+\text{Retail Sales}
++
+\text{Warehouse Sales}
++
+\text{Retail Transfers}
+\]
+
+Transactions are then aggregated by:
+
+- Item Code
+- Item Description
+- Item Type
+- Supplier
+- Year and Month
+
+This produces a monthly outflow measure for each observed item combination.
+
+**Important data treatment:** The current implementation aggregates months present in the transaction records. It does not explicitly generate missing SKU-month combinations with zero demand. Consequently, the calculated monthly mean and standard deviation are based on observed records rather than a complete calendar series.
+
+This distinction matters when interpreting demand variability and XYZ classifications.
+
+### 4.2 ABC Classification — Volume Concentration
+
+ABC analysis identifies products according to their contribution to total outbound volume.
+
+First, total outbound volume is calculated for each item grouping. The records are sorted in descending order of total volume.
+
+The cumulative volume share is calculated as:
+
+\[
+S_i =
+\frac{\sum_{j=1}^{i} V_j}
+{\sum_{j=1}^{n} V_j}
+\]
+
+Where:
+
+- \(V_i\) = total outbound volume for item \(i\)
+- \(S_i\) = cumulative volume share
+- \(n\) = number of item groupings
+
+The classification thresholds implemented in the pipeline are:
+
+\[
+\text{ABC Class} =
 \begin{cases}
 A, & S_i \leq 0.80 \\
 B, & 0.80 < S_i \leq 0.95 \\
@@ -133,139 +182,237 @@ C, & S_i > 0.95
 \end{cases}
 \]
 
-| Class | Cumulative Volume Contribution | Interpretation |
+| Class | Cumulative Volume Threshold | Interpretation |
 |---|---:|---|
-| A | First 80% | High-volume SKUs |
-| B | Next 15% | Medium-volume SKUs |
-| C | Final 5% | Low-volume SKUs |
+| A | First 80% | High-volume contributors |
+| B | Next 15% | Medium-volume contributors |
+| C | Remaining 5% | Low-volume contributors |
 
-This approach identifies products according to their contribution to total outbound volume.
+The thresholds are applied to cumulative volume in descending order.
 
-**Important:** ABC classification in this project is volume-based. It should not be interpreted as a classification by revenue, profitability, or gross margin.
+Because classification is performed at item level, a product that crosses a threshold can fall into the next category. Therefore, actual class contributions may differ slightly from the nominal 80% / 15% / 5% split.
 
-### 4.2 XYZ Analysis — Demand Predictability
+**Interpretation:** ABC classification in this project is based on outbound volume, not sales revenue, gross margin, or inventory value.
 
-Demand variability is evaluated using the Coefficient of Variation (CV) across monthly demand observations.
+### 4.3 XYZ Classification — Demand Variability
+
+XYZ analysis evaluates the variability of historical monthly outflow.
+
+For each item grouping, the pipeline calculates:
+
+- Total observed demand
+- Mean monthly outflow
+- Standard deviation of monthly outflow
+- Number of observed months
+
+Demand variability is measured using the Coefficient of Variation:
 
 \[
-CV = \frac{\sigma_d}{\mu_d}
+CV_i =
+\frac{\sigma_i}{\mu_i}
 \]
 
 Where:
 
-- \(\sigma_d\) = standard deviation of monthly demand
-- \(\mu_d\) = mean monthly demand
+- \(\sigma_i\) = standard deviation of observed monthly outflow
+- \(\mu_i\) = mean observed monthly outflow
 
-The implemented classification thresholds are:
+The standard deviation is calculated using R's sample standard deviation function (`sd()`).
+
+The implemented classification is:
 
 \[
-XYZ_i =
+\text{XYZ Class} =
 \begin{cases}
-X, & CV \leq 0.50 \\
-Y, & 0.50 < CV \leq 1.00 \\
-Z, & CV > 1.00
+X, & CV_i \leq 0.50 \\
+Y, & 0.50 < CV_i \leq 1.00 \\
+Z, & CV_i > 1.00
 \end{cases}
 \]
 
-| Class | CV Range | Interpretation |
+| Class | Coefficient of Variation | Interpretation |
 |---|---:|---|
-| X | CV ≤ 0.50 | Relatively stable demand |
-| Y | 0.50 < CV ≤ 1.00 | Variable demand |
-| Z | CV > 1.00 | Highly variable demand |
+| X | CV ≤ 0.50 | Relatively stable observed demand |
+| Y | 0.50 < CV ≤ 1.00 | Moderately variable observed demand |
+| Z | CV > 1.00 | Highly variable observed demand |
 
-Combining ABC and XYZ produces nine inventory segments, each representing a different combination of volume contribution and demand variability.
+The ABC and XYZ classifications are combined to create nine segments:
 
-### 4.3 Stochastic Safety Stock Modeling
+AX, AY, AZ, BX, BY, BZ, CX, CY and CZ.
 
-A traditional Safety Stock calculation may assume that supplier lead time is constant.
+**Interpretation:** XYZ classification reflects variability across the observed monthly records. Since the current pipeline does not insert zero-demand months where records are absent, intermittent demand may be understated. The classifications should therefore be interpreted with this data-treatment limitation in mind.
 
-This project uses a formulation that accounts for both demand variability and supplier lead-time variability.
+### 4.4 Stochastic Safety Stock Calculation
 
-The model is:
+The inventory model estimates Safety Stock using both demand variability and supplier lead-time variability.
+
+The calculation implemented in the pipeline is:
 
 \[
-SS = Z \times
-\sqrt{
-\bar{L}\sigma_d^2 +
-\bar{d}^{\,2}\sigma_L^2
+SS_i =
+Z \sqrt{
+\bar{L}\sigma_i^2
++
+\bar{d}_i^2\sigma_L^2
 }
 \]
 
 Where:
 
-| Variable | Description |
+| Symbol | Description |
 |---|---|
-| \(SS\) | Safety Stock |
-| \(Z\) | Standard normal quantile associated with target CSL |
-| \(\bar{d}\) | Mean monthly demand |
-| \(\sigma_d\) | Standard deviation of monthly demand |
-| \(\bar{L}\) | Mean supplier lead time in months |
+| \(SS_i\) | Estimated Safety Stock for item \(i\) |
+| \(Z\) | Standard normal quantile for the selected service level |
+| \(\bar{L}\) | Average supplier lead time in months |
+| \(\sigma_i\) | Standard deviation of monthly demand |
+| \(\bar{d}_i\) | Mean monthly demand |
 | \(\sigma_L\) | Standard deviation of supplier lead time in months |
 
-The service-level multiplier is:
+The service-level multiplier is calculated using:
 
 \[
 Z = \Phi^{-1}(CSL)
 \]
 
-Where \(CSL\) represents the target Cycle Service Level.
+Where \(CSL\) is the target Cycle Service Level and \(\Phi^{-1}\) is the inverse standard normal cumulative distribution function.
+
+In R, this is calculated using:
+
+```r
+z_score <- qnorm(target_service_level)
+```
+
+The model separates the variance contributions into two components:
+
+**Demand variability component**
+
+\[
+V_d = \bar{L}\sigma_i^2
+\]
+
+**Lead-time variability component**
+
+\[
+V_L = \bar{d}_i^2\sigma_L^2
+\]
+
+The estimated Safety Stock is then rounded up to the next whole unit:
+
+```r
+safety_stock <- ceiling(
+  z_score * sqrt(var_demand + var_leadtime)
+)
+```
 
 **Model assumptions:**
 
-- Demand and supplier lead-time variability are treated using an independence approximation.
-- Demand and lead-time measurements must use compatible time units.
-- The calculation assumes the statistical inputs are representative of the modeled replenishment period.
-- The resulting Safety Stock is a model estimate, not a guarantee of a particular realized service level.
+- Demand and lead-time variability are combined using an independence approximation.
+- Demand is measured in units per month.
+- Lead time and lead-time standard deviation are measured in months.
+- The model uses a normal-quantile service-level multiplier.
+- The statistical estimates are based on historical observed demand records.
+- The formula is a planning approximation and does not guarantee the realized service level.
 
-### 4.4 Dynamic Reorder Point
+### 4.5 Reorder Point Calculation
 
-The Reorder Point represents the inventory position at which replenishment should be initiated.
+The Reorder Point estimates the inventory position at which replenishment should be initiated.
+
+The calculation is:
 
 \[
-ROP = (\bar{d} \times \bar{L}) + SS
+ROP_i =
+(\bar{d}_i \times \bar{L}) + SS_i
 \]
 
 Where:
 
-- \(\bar{d}\) = average monthly demand
-- \(\bar{L}\) = average supplier lead time in months
-- \(SS\) = calculated Safety Stock
+- \(\bar{d}_i\) = mean monthly demand
+- \(\bar{L}\) = average lead time in months
+- \(SS_i\) = estimated Safety Stock
 
-The model combines expected demand during supplier lead time with a Safety Stock buffer.
+The first component estimates expected demand during supplier lead time. The second component provides a buffer for modeled uncertainty.
 
-This allows the modeled Reorder Point to change when demand, lead-time assumptions, or target service levels change.
+The result is rounded up to a whole unit.
 
-### 4.5 Working Capital & Carrying Cost Analysis
+```r
+reorder_point <- ceiling(
+  (mean_monthly_demand * lead_time_months) +
+    safety_stock
+)
+```
 
-The project estimates the capital associated with holding calculated Safety Stock.
+The batch pipeline uses the configured baseline assumptions:
 
-Safety Stock capital is estimated as:
+| Parameter | Baseline Value |
+|---|---:|
+| Target Cycle Service Level | 95% |
+| Average Lead Time | 1.0 month |
+| Lead-Time Standard Deviation | 0.20 months |
+
+These are model configuration assumptions, not supplier-specific measurements.
+
+### 4.6 Interactive Scenario Analysis
+
+The Shiny application recalculates the inventory policy when the user changes the scenario parameters.
+
+The available controls include:
+
+| Parameter | Interactive Range / Default |
+|---|---|
+| Cycle Service Level | 80%–99.9%, default 95% |
+| Average Lead Time | 0.5–3.0 months, default 1.0 |
+| Lead-Time Standard Deviation | 0–1.0 months, default 0.20 |
+| Estimated Average Unit Cost | Default $15 |
+| Annual Carrying-Cost Rate | 10%–40%, default 22% |
+
+The application recalculates the Z-score, Safety Stock and Reorder Point using the selected assumptions.
+
+This enables scenario comparisons without modifying the underlying source data.
+
+### 4.7 Working Capital & Annual Carrying Cost
+
+The Shiny application estimates the capital associated with the calculated Safety Stock.
+
+The calculation is:
 
 \[
-\text{Safety Stock Capital}
+\text{Estimated Safety Stock Capital}
 =
-\sum_i (SS_i \times UnitCost_i)
-\]
-
-Annual holding cost is estimated as:
-
-\[
-\text{Annual Holding Cost}
-=
-\text{Safety Stock Capital} \times H
+\left(\sum_i SS_i\right) \times C
 \]
 
 Where:
 
-- \(SS_i\) = Safety Stock for SKU \(i\)
-- \(UnitCost_i\) = unit-cost input used for SKU \(i\)
-- \(H\) = assumed annual inventory carrying-cost rate
+- \(SS_i\) = calculated Safety Stock for item \(i\)
+- \(C\) = user-selected average unit cost
 
-The project uses an illustrative carrying-cost range of **18%–25%**.
+Annual carrying cost is estimated as:
 
-This range represents an assumption for scenario analysis, not a measured carrying-cost rate for a specific business.
+\[
+\text{Estimated Annual Carrying Cost}
+=
+\text{Estimated Safety Stock Capital} \times H
+\]
 
-Financial estimates depend on the unit-cost inputs and carrying-cost assumptions used in the implementation. They should not be interpreted as realized working-capital savings.
+Where \(H\) is the selected annual carrying-cost rate.
+
+**Important:** The current application uses one user-entered average unit cost across all filtered items. It does not calculate SKU-specific inventory valuation from actual purchase costs.
+
+Consequently, these outputs are illustrative scenario estimates rather than audited inventory valuation or measured working-capital savings.
+
+### 4.8 Methodology Limitations
+
+The following limitations should be considered when interpreting the results:
+
+1. **Observed-month aggregation:** Missing SKU-month records are not explicitly filled with zero demand. This can affect demand variability estimates, particularly for intermittent products.
+2. **Item grouping:** The pipeline groups records by Item Code, Description, Item Type and Supplier. If these attributes vary for the same Item Code, multiple item groupings may be created.
+3. **ABC threshold boundaries:** The classification is based on cumulative volume and can cross nominal thresholds between items.
+4. **Lead-time assumptions:** The batch pipeline uses configured lead-time assumptions rather than historical supplier-specific lead-time distributions.
+5. **Statistical assumptions:** The Safety Stock formula uses an independence approximation and a normal-quantile service-level multiplier.
+6. **Cost assumptions:** The Shiny application uses a single average unit-cost input and a user-selected carrying-cost percentage.
+7. **Historical data:** Historical outflow patterns may not represent future demand or supplier behavior.
+
+The framework is intended for analytical exploration and inventory-policy evaluation. Operational use would require validation against complete demand histories, actual supplier lead times, SKU-level costs and realized inventory performance.
 
 ---
 
