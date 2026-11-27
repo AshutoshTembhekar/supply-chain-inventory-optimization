@@ -1,4 +1,4 @@
-
+[
 # Supply Chain Inventory Optimization
 
 ### ABC-XYZ Demand Segmentation & Stochastic Inventory Policy Engine
@@ -588,3 +588,4 @@ Supply Chain Analytics | Data Analytics | Statistical Modeling
 
 ---
 
+](https://github.com/AshutoshTembhekar/supply-chain-inventory-optimization/blob/main/README.md)
