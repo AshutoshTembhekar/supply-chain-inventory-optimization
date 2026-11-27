@@ -456,11 +456,8 @@ Run the following command in R or RStudio:
 
 ```r
 install.packages(c(
-  "readr",
-  "dplyr",
-  "tidyr",
+  "tidyverse",
   "lubridate",
-  "ggplot2",
   "scales",
   "shiny",
   "bslib",
