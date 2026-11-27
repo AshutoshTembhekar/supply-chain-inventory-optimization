@@ -585,7 +585,3 @@ Supply Chain Analytics | Data Analytics | Statistical Modeling
 
 - GitHub: [AshutoshTembhekar](https://github.com/AshutoshTembhekar)
 - LinkedIn: [Ashutosh Tembhekar](https://www.linkedin.com/in/ashutoshtembhekar/)
-
----
-
-](https://github.com/AshutoshTembhekar/supply-chain-inventory-optimization/blob/main/README.md)
