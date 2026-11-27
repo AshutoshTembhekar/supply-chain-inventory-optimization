@@ -281,40 +281,66 @@ The simulation makes it possible to evaluate how inventory policy assumptions af
 
 ```mermaid
 flowchart TD
-    ROOT["supply-chain-inventory-optimization/"]
+    ROOT["supply-chain-inventory-optimization"]
 
     ROOT --> SRC["Source Code"]
-    ROOT --> DATA["Analytical Outputs"]
-    ROOT --> CONFIG["Configuration"]
+    ROOT --> OUT["Analytical Outputs"]
+    ROOT --> CFG["Configuration"]
     ROOT --> DOC["Documentation"]
 
-    SRC --> APP["app.R<br/>Shiny Simulation Dashboard"]
-    SRC --> PIPE["supply_chain_pipeline.R<br/>Data Processing & Optimization"]
+    SRC --> APP["app.R<br/>Shiny Dashboard"]
+    SRC --> PIPE["supply_chain_pipeline.R<br/>Analytics Pipeline"]
 
-    DATA --> SUMMARY["abc_xyz_matrix_summary.csv"]
-    DATA --> DIST["eda_abc_xyz_distribution.png"]
-    DATA --> SKU["sku_inventory_optimization.csv"]
+    OUT --> CSV1["abc_xyz_matrix_summary.csv"]
+    OUT --> PNG["eda_abc_xyz_distribution.png"]
+    OUT --> CSV2["sku_inventory_optimization.csv"]
 
-    CONFIG --> LINT[".lintr"]
-    CONFIG --> IGNORE[".gitignore"]
+    CFG --> LINT[".lintr"]
+    CFG --> GIT[".gitignore"]
 
     DOC --> README["README.md"]
 
-    EXTERNAL["External Dataset<br/>Warehouse_and_Retail_Sales.csv"]
-    EXTERNAL -. "Downloaded separately" .-> ROOT
+    EXT["External Dataset<br/>Warehouse_and_Retail_Sales.csv"]
+    EXT -.-> ROOT
 
-    classDef root fill:#166534,color:#ffffff,stroke:#14532d,stroke-width:2px
-    classDef source fill:#1d4ed8,color:#ffffff,stroke:#1e40af
-    classDef output fill:#0f766e,color:#ffffff,stroke:#115e59
-    classDef config fill:#64748b,color:#ffffff,stroke:#475569
-    classDef external fill:#92400e,color:#ffffff,stroke:#78350f
+    classDef root fill:#166534,color:#fff,stroke:#14532d
+    classDef source fill:#1d4ed8,color:#fff,stroke:#1e40af
+    classDef output fill:#0f766e,color:#fff,stroke:#115e59
+    classDef config fill:#64748b,color:#fff,stroke:#475569
+    classDef external fill:#92400e,color:#fff,stroke:#78350f
 
     class ROOT root
     class APP,PIPE source
-    class SUMMARY,DIST,SKU output
-    class LINT,IGNORE,README config
-    class EXTERNAL external
+    class CSV1,PNG,CSV2 output
+    class LINT,GIT,README config
+    class EXT external
 ```
+
+
+## Architectural Pipeline
+
+```mermaid
+flowchart TD
+    A["Raw Transaction Logs"] --> B["Data Ingestion and Sanitization"]
+    B --> C["Monthly SKU Demand Aggregation"]
+    C --> D["ABC-XYZ Demand Segmentation"]
+    D --> E["Stochastic Inventory Optimization"]
+    E --> F["Batch Analytical Outputs"]
+    E --> G["Interactive Shiny Simulation"]
+
+    F --> H["CSV Summaries and Distribution Plot"]
+    G --> I["Service-Level and Lead-Time Simulation"]
+    G --> J["Working Capital Analysis"]
+    G --> K["SKU-Level Policy Explorer"]
+
+    classDef process fill:#1e293b,color:#fff,stroke:#38bdf8
+    classDef output fill:#065f46,color:#fff,stroke:#10b981
+
+    class A,B,C,D,E process
+    class F,G,H,I,J,K output
+```
+
+---
 
 
 ### External Dataset
